@@ -1,0 +1,559 @@
+local Players = game:GetService("Players")
+local defaultHRPValues = {}
+
+local Light = game:GetService("Lighting")
+
+function dofullbright()
+    Light.Ambient = Color3.new(1, 1, 1)
+    Light.ColorShift_Bottom = Color3.new(1, 1, 1)
+    Light.ColorShift_Top = Color3.new(1, 1, 1)
+end
+
+dofullbright()
+Light.LightingChanged:Connect(dofullbright)
+
+-- made by zerodeptraiso1tg(sigma boi)
+local fov = 50
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Cam = game.Workspace.CurrentCamera
+local Player = game:GetService("Players").LocalPlayer
+
+local FOVring = Drawing.new("Circle")
+FOVring.Visible = false
+FOVring.Thickness = 2
+FOVring.Color = Color3.fromRGB(128, 0, 128)
+FOVring.Filled = false
+FOVring.Radius = fov
+
+RunService.RenderStepped:Connect(function()
+    if Cam then
+        FOVring.Position = Vector2.new(Cam.ViewportSize.X / 2 , Cam.ViewportSize.Y / 2 )
+
+    end
+end)
+
+
+local isAiming = false
+local validNPCs = {}
+local raycastParams = RaycastParams.new()
+raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 120, 0, 40)
+ToggleButton.Position = UDim2.new(0, 10, 0, 10)
+ToggleButton.Text = "AIMBOT: OFF"
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 14
+ToggleButton.Parent = ScreenGui
+
+ToggleButton.MouseButton1Click:Connect(function()
+    if dragging then return end  -- Chặn click nếu vừa kéo
+
+    isAiming = not isAiming
+    FOVring.Visible = isAiming
+    ToggleButton.Text = "AIMBOT: " .. (isAiming and "ON" or "OFF")
+
+    if isAiming then
+        isAimbotRainbow = true
+    else
+        isAimbotRainbow = false
+        ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50) -- Mặc định lại màu đỏ
+    end
+end)
+
+-- Thay đổi màu chữ khi bật AIMBOT
+RunService.Heartbeat:Connect(function()
+    if isAimbotRainbow then
+        local hue = tick() % 5 / 5 -- Hue thay đổi liên tục
+        local rainbowColor = Color3.fromHSV(hue, 1, 1)
+        ToggleButton.TextColor3 = rainbowColor -- Chỉ đổi màu chữ
+    end
+end)
+
+
+local fovLevels = {
+    {name = "Siêu nhỏ", color = Color3.fromRGB(0, 255, 0), size = 70},
+    {name = "Nhỏ", color = Color3.fromRGB(173, 255, 47), size = 100},
+    {name = "Bình thường", color = Color3.fromRGB(255, 255, 0), size = 150},
+    {name = "Hơi to", color = Color3.fromRGB(255, 165, 0), size = 210},
+    {name = "Khá to", color = Color3.fromRGB(255, 140, 0), size = 290},
+    {name = "Cực to", color = Color3.fromRGB(255, 69, 0), size = 370},
+    {name = "Siêu to", color = Color3.fromRGB(255, 0, 0), size = 500},
+    {name = "Sigma boi", color = nil, size = 650} -- Bảy màu
+}
+
+local currentFOVIndex = 1 -- Mặc định "Bình thường"
+
+local FOVButton = Instance.new("TextButton")
+FOVButton.Size = UDim2.new(0, 125, 0, 40) -- Kích thước bằng nút AIMBOT
+FOVButton.Position = UDim2.new(0, ToggleButton.Position.X.Offset + ToggleButton.Size.X.Offset + 10, 0, ToggleButton.Position.Y.Offset) -- Cách 10px bên phải
+FOVButton.Text = "FOV: Bình thường"
+FOVButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+FOVButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+FOVButton.Font = Enum.Font.GothamBold
+FOVButton.TextSize = 14
+FOVButton.Parent = ScreenGui
+
+
+local function updateFOV()
+    local level = fovLevels[currentFOVIndex]
+    fov = level.size
+    FOVring.Radius = fov
+    FOVButton.Text = "Kích cỡ: " .. level.name
+    
+    if level.color then
+        isRainbow = false
+        FOVButton.TextColor3 = level.color
+    else
+        isRainbow = true
+        FOVButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Mặc định trắng khi bảy màu
+    end
+end
+
+FOVButton.MouseButton1Click:Connect(function()
+    currentFOVIndex = (currentFOVIndex % #fovLevels) + 1 -- Chuyển sang mức tiếp theo
+    updateFOV()
+end)
+
+RunService.Heartbeat:Connect(function()
+    if isRainbow then
+        local hue = tick() % 5 / 5
+        local rainbowColor = Color3.fromHSV(hue, 1, 1)
+        FOVButton.TextColor3 = rainbowColor
+    end
+end)
+
+updateFOV()
+
+local colors = {
+    {name = "Xanh lá", color = Color3.fromRGB(0, 255, 0)},
+    {name = "Đỏ", color = Color3.fromRGB(255, 0, 0)},
+    {name = "Xanh Dương", color = Color3.fromRGB(0, 0, 255)},
+    {name = "Vàng", color = Color3.fromRGB(255, 255, 0)},
+    {name = "Trắng", color = Color3.fromRGB(255, 255, 255)},
+    {name = "Đen", color = Color3.fromRGB(0, 0, 0)},
+    {name = "Bảy màu", color = nil} -- Chế độ đổi màu liên tục
+}
+
+local colorIndex = 1
+local isRainbow = false
+
+-- Tạo nút đổi màu
+local ColorButton = Instance.new("TextButton")
+ColorButton.Size = UDim2.new(0, 120, 0, 40)
+ColorButton.Position = UDim2.new(0, 10, 0, 60) -- Dưới nút AIMBOT
+ColorButton.Text = "FOV: Mặc định"
+ColorButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ColorButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ColorButton.Font = Enum.Font.GothamBold
+ColorButton.TextSize = 14
+ColorButton.Parent = ScreenGui
+
+local function updateFOVColor()
+    local data = colors[colorIndex]
+    if data.color then
+        isRainbow = false
+        FOVring.Color = data.color
+        ColorButton.Text = "FOV: " .. data.name
+        ColorButton.TextColor3 = data.color -- Đổi màu chữ của nút
+    else
+        isRainbow = true
+        ColorButton.Text = "FOV: Bảy màu"
+        ColorButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Mặc định màu chữ trắng
+    end
+end
+
+ColorButton.MouseButton1Click:Connect(function()
+    colorIndex = (colorIndex % #colors) + 1 -- Chuyển màu tiếp theo
+    updateFOVColor()
+end)
+
+RunService.Heartbeat:Connect(function()
+    if isRainbow then
+        local hue = tick() % 5 / 5 -- Hue thay đổi liên tục
+        local rainbowColor = Color3.fromHSV(hue, 1, 1)
+
+        -- Cập nhật màu FOV
+        FOVring.Color = rainbowColor
+        
+        -- Cập nhật màu chữ của nút
+        ColorButton.TextColor3 = rainbowColor
+    end
+end)
+
+updateFOVColor()
+
+-- Tạo nút Hitbox
+local HitboxButton = Instance.new("TextButton")
+HitboxButton.Size = UDim2.new(0, 120, 0, 40)
+HitboxButton.Position = UDim2.new(0, 10, 0, 110) -- Tạm thời đặt vị trí (sẽ điều chỉnh lại sau)
+HitboxButton.Text = "HITBOX: OFF"
+HitboxButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+HitboxButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+HitboxButton.Font = Enum.Font.GothamBold
+HitboxButton.TextSize = 14
+HitboxButton.Parent = ScreenGui
+
+-- Khởi tạo biến kiểm tra trạng thái hitbox
+local hitboxToggleEnabled = false
+local defaultHRPValues = {}
+
+local function updateNPCHitbox(npc)
+    if npc:IsA("Model") and npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
+        if Players:GetPlayerFromCharacter(npc) then
+            return
+        end
+        if npc.Name == "Horse" then
+            return
+        end
+
+        local humanoid = npc.Humanoid
+        local hrp = npc.HumanoidRootPart
+
+        if defaultHRPValues[hrp] == nil then
+            defaultHRPValues[hrp] = {
+                Size = hrp.Size,
+                Transparency = hrp.Transparency,
+                CanCollide = hrp.CanCollide
+            }
+        end
+
+        if humanoid.Health <= 0 then
+            local defaults = defaultHRPValues[hrp]
+            if defaults then
+                hrp.Size = defaults.Size
+                hrp.Transparency = defaults.Transparency
+                hrp.CanCollide = defaults.CanCollide
+            end
+            return
+        end
+
+        -- Khi hitbox được bật, thay đổi kích thước và độ trong suốt
+        if hitboxToggleEnabled then
+            hrp.Size = Vector3.new(10, 10, 10)
+            hrp.Transparency = 0.70
+            hrp.CanCollide = false
+        else
+            -- Trả lại kích thước và các thuộc tính mặc định của hitbox khi tắt
+            local defaults = defaultHRPValues[hrp]
+            if defaults then
+                hrp.Size = defaults.Size
+                hrp.Transparency = defaults.Transparency
+                hrp.CanCollide = defaults.CanCollide
+            end
+        end
+    end
+end
+
+-- Cập nhật hitbox cho tất cả NPC mỗi 0.5 giây
+local function updateAllNPCsHitbox()
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("Model") 
+           and obj:FindFirstChild("HumanoidRootPart") 
+           and obj:FindFirstChild("Humanoid") 
+           and not Players:GetPlayerFromCharacter(obj) then
+            updateNPCHitbox(obj)
+        end
+    end
+end
+
+-- Biến kiểm tra vòng lặp khi bật
+local updateLoop
+
+-- Sự kiện khi nhấn nút Hitbox
+HitboxButton.MouseButton1Click:Connect(function()
+    hitboxToggleEnabled = not hitboxToggleEnabled  -- Đảo ngược trạng thái hitbox
+
+    -- Cập nhật văn bản trên nút
+    if hitboxToggleEnabled then
+        HitboxButton.Text = "HITBOX: BẬT"
+
+        -- Bắt đầu cập nhật hitbox mỗi 0.5 giây khi bật
+        updateLoop = coroutine.create(function()
+            while hitboxToggleEnabled do
+                updateAllNPCsHitbox()
+                wait(0.5)  -- Cập nhật mỗi 0.5 giây
+            end
+        end)
+        coroutine.resume(updateLoop)  -- Bắt đầu vòng lặp coroutine
+    else
+        HitboxButton.Text = "HITBOX: TẮT"
+
+        -- Dừng vòng lặp khi tắt và reset hitbox cho tất cả NPC
+        if updateLoop then
+            hitboxToggleEnabled = false
+            coroutine.close(updateLoop)
+        end
+
+        -- Reset hitbox cho tất cả NPC khi tắt
+        updateAllNPCsHitbox()
+    end
+end)
+
+
+-- Đặt vị trí ban đầu cho bốn nút, cách nhau 10px
+ToggleButton.Position = UDim2.new(0, 10, 0, 10) -- Nút đầu tiên
+ColorButton.Position = UDim2.new(0, ToggleButton.Position.X.Offset + ToggleButton.Size.X.Offset + 10, 0, 10) -- Cách 10px
+FOVButton.Position = UDim2.new(0, ColorButton.Position.X.Offset + ColorButton.Size.X.Offset + 10, 0, 10) -- Cách 10px
+HitboxButton.Position = UDim2.new(0, FOVButton.Position.X.Offset + FOVButton.Size.X.Offset + 10, 0, 10) -- Cách 10px
+
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    local newX = startPos.X.Offset + delta.X
+    local newY = startPos.Y.Offset + delta.Y
+
+    -- Chỉ cập nhật vị trí nếu thay đổi lớn hơn 1 pixel để tránh giật
+    if math.abs(delta.X) > 1 or math.abs(delta.Y) > 1 then
+        ToggleButton.Position = UDim2.new(0, newX, 0, newY)
+        ColorButton.Position = UDim2.new(0, newX + ToggleButton.Size.X.Offset + 10, 0, newY)
+        FOVButton.Position = UDim2.new(0, newX + ToggleButton.Size.X.Offset + ColorButton.Size.X.Offset + 20, 0, newY)
+        HitboxButton.Position = UDim2.new(0, newX + ToggleButton.Size.X.Offset + ColorButton.Size.X.Offset + FOVButton.Size.X.Offset + 30, 0, newY)
+    end
+end
+
+local function setupDrag(button)
+    button.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = button.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    button.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+end
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+setupDrag(ToggleButton)
+setupDrag(ColorButton)
+setupDrag(FOVButton)
+setupDrag(HitboxButton)
+
+-- **Fix lỗi Click không hoạt động sau khi kéo**
+ToggleButton.MouseButton1Click:Connect(function()
+    if isDragging then return end  -- Chặn nếu đang kéo
+    isAiming = not isAiming
+    FOVring.Visible = isAiming
+    ToggleButton.Text = "AIMBOT: " .. (isAiming and "ON" or "OFF")
+    ToggleButton.TextColor3 = isAiming and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50)
+end)
+
+
+
+local function isNPC(obj)
+    if obj:IsA("Model") and obj:FindFirstChild("Humanoid") and obj:FindFirstChild("Head") and obj:FindFirstChild("HumanoidRootPart") then
+        if obj.Humanoid.Health > 0 and not game:GetService("Players"):GetPlayerFromCharacter(obj) then
+            if obj.Name ~= "Horse" then -- Loại bỏ NPC có tên "Horse"
+                return true
+            end
+        end
+    end
+    return false
+end
+
+
+local function updateNPCs()
+    local newValidNPCs = {} -- Danh sách NPC mới
+
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if isNPC(obj) then
+            table.insert(newValidNPCs, obj)
+        end
+    end
+
+    validNPCs = newValidNPCs -- Cập nhật danh sách mới
+end 
+
+
+
+local function handleDescendant(descendant)
+    if isNPC(descendant) then
+        table.insert(validNPCs, descendant)
+        local humanoid = descendant:WaitForChild("Humanoid")
+        humanoid.Destroying:Connect(function()
+            for i = #validNPCs, 1, -1 do
+                if validNPCs[i] == descendant then
+                    table.remove(validNPCs, i)
+                    break
+                end
+            end
+        end)
+    end
+end
+
+workspace.DescendantAdded:Connect(function(descendant)
+    if isNPC(descendant) and not table.find(validNPCs, descendant) then
+        table.insert(validNPCs, descendant)
+    end
+end)
+
+local function updateDrawings()
+    if Cam and FOVring then
+        FOVring.Position = Vector2.new(Cam.ViewportSize.X / 2, Cam.ViewportSize.Y / 2)
+        FOVring.Radius = fov * (Cam.ViewportSize.Y / 1080)  
+        
+    end
+end
+
+game:GetService("RunService").Heartbeat:Connect(updateDrawings)
+
+
+local function predictPos(target)
+    local rootPart = target:FindFirstChild("HumanoidRootPart")
+    local head = target:FindFirstChild("Head")
+    if not rootPart or not head then
+        return head and head.Position or rootPart and rootPart.Position
+    end
+    local velocity = rootPart.Velocity
+    local predictionTime = 0.02
+    local basePosition = rootPart.Position + velocity * predictionTime
+    local headOffset = head.Position - rootPart.Position
+    return basePosition + headOffset
+end
+
+local aimRange = 350 -- Chỉ aim NPC trong bán kính này (có thể chỉnh)
+
+local function getTarget()
+    local nearest = nil
+    local minDistance = math.huge
+    local viewportCenter = Cam.ViewportSize / 2
+    raycastParams.FilterDescendantsInstances = {Player.Character}
+
+    for _, npc in ipairs(validNPCs) do
+        local predictedPos = predictPos(npc)
+        local screenPos, visible = Cam:WorldToViewportPoint(predictedPos)
+        
+        if visible and screenPos.Z > 0 then
+            local playerPos = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") and Player.Character.HumanoidRootPart.Position
+            if playerPos then
+                local distanceToNPC = (npc:FindFirstChild("HumanoidRootPart").Position - playerPos).Magnitude
+
+                -- CHỈ AIM nếu NPC nằm trong phạm vi aimRange
+                if distanceToNPC <= aimRange then
+                    local ray = workspace:Raycast(
+                        Cam.CFrame.Position,
+                        (predictedPos - Cam.CFrame.Position).Unit * 1000,
+                        raycastParams
+                    )
+                 
+                    if ray and ray.Instance:IsDescendantOf(npc) then
+                        local distance = (Vector2.new(screenPos.X, screenPos.Y) - viewportCenter).Magnitude
+                        if distance < minDistance and distance < fov then
+                            minDistance = distance
+                            nearest = npc
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return nearest
+end
+
+
+local function aim(targetPosition)
+    local currentCF = Cam.CFrame
+    local targetDirection = (targetPosition - currentCF.Position).Unit
+    local smoothFactor = 0.650
+    local newLookVector = currentCF.LookVector:Lerp(targetDirection, smoothFactor)
+    Cam.CFrame = CFrame.new(currentCF.Position, currentCF.Position + newLookVector)
+end
+
+local heartbeat = RunService.Heartbeat
+local lastUpdate = 0
+local UPDATE_INTERVAL = 0.2 -- Cập nhật mỗi 0.4 giây
+
+RunService.Heartbeat:Connect(function(dt)
+    updateDrawings()  -- Cập nhật vị trí FOVring mỗi lần vẽ
+    lastUpdate = lastUpdate + dt
+    if lastUpdate >= UPDATE_INTERVAL then
+        updateNPCs() -- Cập nhật danh sách NPC hợp lệ
+        lastUpdate = 0
+    end
+    if isAiming then
+        local target = getTarget()
+        if target then
+            local predictedPosition = predictPos(target)
+            aim(predictedPosition)
+        end
+    end
+end)
+
+
+ToggleButton.MouseButton1Click:Connect(function()
+    isAiming = not isAiming
+    FOVring.Visible = isAiming
+    ToggleButton.Text = "AIMBOT: " .. (isAiming and "BẬT" or "TẮT")
+    ToggleButton.TextColor3 = isAiming and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50)
+end)
+
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    ToggleButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+ToggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = ToggleButton.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+ 
+ToggleButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+updateNPCs()
+workspace.DescendantRemoved:Connect(function(descendant)
+    for i = #validNPCs, 1, -1 do
+        if validNPCs[i] == descendant then
+            table.remove(validNPCs, i)
+            break
+        end
+    end
+end)
+
+game:GetService("Players").PlayerRemoving:Connect(function()
+    FOVring:Remove()
+    ScreenGui:Destroy()
+end)
+
+RunService.Heartbeat:Connect(updateHitboxes)
