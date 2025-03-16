@@ -45,7 +45,7 @@ ScreenGui.Parent = game.CoreGui
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Size = UDim2.new(0, 120, 0, 40)
 ToggleButton.Position = UDim2.new(0, 10, 0, 10)
-ToggleButton.Text = "AIMBOT: OFF"
+ToggleButton.Text = "AIMBOT: TẮT"
 ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
 ToggleButton.Font = Enum.Font.GothamBold
@@ -57,7 +57,7 @@ ToggleButton.MouseButton1Click:Connect(function()
 
     isAiming = not isAiming
     FOVring.Visible = isAiming
-    ToggleButton.Text = "AIMBOT: " .. (isAiming and "ON" or "OFF")
+    ToggleButton.Text = "AIMBOT: " .. (isAiming and "BẬT" or "TẮT")
 
     if isAiming then
         isAimbotRainbow = true
@@ -193,7 +193,7 @@ updateFOVColor()
 local HitboxButton = Instance.new("TextButton")
 HitboxButton.Size = UDim2.new(0, 120, 0, 40)
 HitboxButton.Position = UDim2.new(0, 10, 0, 110) -- Tạm thời đặt vị trí (sẽ điều chỉnh lại sau)
-HitboxButton.Text = "HITBOX: OFF"
+HitboxButton.Text = "HITBOX: TẮT"
 HitboxButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 HitboxButton.TextColor3 = Color3.fromRGB(255, 50, 50)
 HitboxButton.Font = Enum.Font.GothamBold
