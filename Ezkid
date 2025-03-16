@@ -267,12 +267,39 @@ end
 local updateLoop
 
 -- Sự kiện khi nhấn nút Hitbox
-HitboxButton.MouseButton1Click:Connect(function()
-    hitboxToggleEnabled = not hitboxToggleEnabled  -- Đảo ngược trạng thái hitbox
+local RunService = game:GetService("RunService")
 
-    -- Cập nhật văn bản trên nút
+local defaultTextColor = Color3.fromRGB(255, 50, 50)  -- Màu mặc định khi tắt
+local isRainbowActive = false  -- Biến kiểm tra hiệu ứng cầu vồng
+local rainbowConnection  -- Biến lưu kết nối Heartbeat
+
+local function startRainbowEffect()
+    if rainbowConnection then return end  -- Nếu đã chạy thì không tạo thêm
+
+    rainbowConnection = RunService.Heartbeat:Connect(function()
+        if isRainbowActive then
+            local hue = tick() % 5 / 5  -- Hue thay đổi liên tục
+            local rainbowColor = Color3.fromHSV(hue, 1, 1)
+            HitboxButton.TextColor3 = rainbowColor  -- Chỉ đổi màu chữ
+        end
+    end)
+end
+
+local function stopRainbowEffect()
+    if rainbowConnection then
+        rainbowConnection:Disconnect()  -- Ngừng Heartbeat
+        rainbowConnection = nil
+    end
+    HitboxButton.TextColor3 = defaultTextColor  -- Đổi về màu mặc định
+end
+
+HitboxButton.MouseButton1Click:Connect(function()
+    hitboxToggleEnabled = not hitboxToggleEnabled  -- Đảo trạng thái bật/tắt
+
     if hitboxToggleEnabled then
         HitboxButton.Text = "HITBOX: BẬT"
+        isRainbowActive = true
+        startRainbowEffect()
 
         -- Bắt đầu cập nhật hitbox mỗi 0.5 giây khi bật
         updateLoop = coroutine.create(function()
@@ -284,6 +311,8 @@ HitboxButton.MouseButton1Click:Connect(function()
         coroutine.resume(updateLoop)  -- Bắt đầu vòng lặp coroutine
     else
         HitboxButton.Text = "HITBOX: TẮT"
+        isRainbowActive = false
+        stopRainbowEffect()
 
         -- Dừng vòng lặp khi tắt và reset hitbox cho tất cả NPC
         if updateLoop then
