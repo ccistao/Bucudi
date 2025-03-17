@@ -1,5 +1,4 @@
 -- made by zerodeptraiso1tg(sigma boi)
-
 local Players = game:GetService("Players")
 local defaultHRPValues = {}
 
@@ -33,7 +32,6 @@ RunService.RenderStepped:Connect(function()
 
     end
 end)
-
 
 local isAiming = false
 local validNPCs = {}
@@ -78,7 +76,6 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-
 local fovLevels = {
     {name = "Siêu nhỏ", color = Color3.fromRGB(0, 255, 0), size = 70},
     {name = "Nhỏ", color = Color3.fromRGB(173, 255, 47), size = 100},
@@ -101,7 +98,6 @@ FOVButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 FOVButton.Font = Enum.Font.GothamBold
 FOVButton.TextSize = 14
 FOVButton.Parent = ScreenGui
-
 
 local function updateFOV()
     local level = fovLevels[currentFOVIndex]
@@ -326,7 +322,6 @@ HitboxButton.MouseButton1Click:Connect(function()
     end
 end)
 
-
 -- Đặt vị trí ban đầu cho bốn nút, cách nhau 10px
 ToggleButton.Position = UDim2.new(0, 10, 0, 10) -- Nút đầu tiên
 ColorButton.Position = UDim2.new(0, ToggleButton.Position.X.Offset + ToggleButton.Size.X.Offset + 10, 0, 10) -- Cách 10px
@@ -390,8 +385,6 @@ ToggleButton.MouseButton1Click:Connect(function()
     ToggleButton.TextColor3 = isAiming and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50)
 end)
 
-
-
 local function isNPC(obj)
     if obj:IsA("Model") and obj:FindFirstChild("Humanoid") and obj:FindFirstChild("Head") and obj:FindFirstChild("HumanoidRootPart") then
         if obj.Humanoid.Health > 0 and not game:GetService("Players"):GetPlayerFromCharacter(obj) then
@@ -402,7 +395,6 @@ local function isNPC(obj)
     end
     return false
 end
-
 
 local function updateNPCs()
     local newValidNPCs = {} -- Danh sách NPC mới
@@ -415,8 +407,6 @@ local function updateNPCs()
 
     validNPCs = newValidNPCs -- Cập nhật danh sách mới
 end 
-
-
 
 local function handleDescendant(descendant)
     if isNPC(descendant) then
@@ -448,7 +438,6 @@ local function updateDrawings()
 end
 
 game:GetService("RunService").Heartbeat:Connect(updateDrawings)
-
 
 local function predictPos(target)
     local rootPart = target:FindFirstChild("HumanoidRootPart")
@@ -502,7 +491,6 @@ local function getTarget()
     return nearest
 end
 
-
 local function aim(targetPosition)
     local currentCF = Cam.CFrame
     local targetDirection = (targetPosition - currentCF.Position).Unit
@@ -530,7 +518,6 @@ RunService.Heartbeat:Connect(function(dt)
         end
     end
 end)
-
 
 ToggleButton.MouseButton1Click:Connect(function()
     isAiming = not isAiming
