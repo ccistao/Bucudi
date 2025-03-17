@@ -54,6 +54,7 @@ ToggleButton.TextSize = 14
 ToggleButton.Parent = ScreenGui
 
 ToggleButton.MouseButton1Click:Connect(function()
+    local isDragging = false
     if dragging then return end  -- Chặn click nếu vừa kéo
 
     isAiming = not isAiming
@@ -237,7 +238,7 @@ local function updateNPCHitbox(npc)
         -- Khi hitbox được bật, thay đổi kích thước và độ trong suốt
         if hitboxToggleEnabled then
             hrp.Size = Vector3.new(10, 10, 10)
-            hrp.Transparency = 0.70
+            hrp.Transparency = 0.68
             hrp.CanCollide = false
         else
             -- Trả lại kích thước và các thuộc tính mặc định của hitbox khi tắt
