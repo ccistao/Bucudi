@@ -572,14 +572,16 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 updateNPCs()
-workspace.DescendantRemoved:Connect(function(descendant)
-    for i = #validNPCs, 1, -1 do
-        if validNPCs[i] == descendant then
-            table.remove(validNPCs, i)
-            break
+if workspace:FindFirstChild("DescendantRemoved") then
+    workspace.DescendantRemoved:Connect(function(descendant)
+        for i = #validNPCs, 1, -1 do
+            if validNPCs[i] == descendant then
+                table.remove(validNPCs, i)
+                break
+            end
         end
-    end
-end)
+    end)
+end
 
 game:GetService("Players").PlayerRemoving:Connect(function()
     FOVring:Remove()
