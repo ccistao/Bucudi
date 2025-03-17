@@ -463,7 +463,7 @@ local function predictPos(target)
     return basePosition + headOffset
 end
 
-local aimRange = 350 -- Chỉ aim NPC trong bán kính này (có thể chỉnh)
+local aimRange = 400 -- Chỉ aim NPC trong bán kính này (có thể chỉnh)
 
 local function getTarget()
     local nearest = nil
