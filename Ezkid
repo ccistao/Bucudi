@@ -203,7 +203,6 @@ HitboxButton.Parent = ScreenGui
 
 -- Khởi tạo biến kiểm tra trạng thái hitbox
 local hitboxToggleEnabled = false
-local defaultHRPValues = {}
 
 local function updateNPCHitbox(npc)
     if npc:IsA("Model") and npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
