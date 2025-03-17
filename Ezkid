@@ -572,8 +572,10 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 updateNPCs()
-if workspace:FindFirstChild("DescendantRemoved") then
-    workspace.DescendantRemoved:Connect(function(descendant)
+local npcFolder = workspace:FindFirstChild("NPCs")  -- Thay bằng tên thư mục NPC của game bạn
+
+if npcFolder then
+    npcFolder.DescendantRemoved:Connect(function(descendant)
         for i = #validNPCs, 1, -1 do
             if validNPCs[i] == descendant then
                 table.remove(validNPCs, i)
