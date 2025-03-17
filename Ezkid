@@ -513,7 +513,7 @@ end
 
 local heartbeat = RunService.Heartbeat
 local lastUpdate = 0
-local UPDATE_INTERVAL = 0.2 -- Cập nhật mỗi 0.4 giây
+local UPDATE_INTERVAL = 0.5 -- Cập nhật mỗi 0.5 giây
 
 RunService.Heartbeat:Connect(function(dt)
     updateDrawings()  -- Cập nhật vị trí FOVring mỗi lần vẽ
@@ -584,6 +584,7 @@ end)
 game:GetService("Players").PlayerRemoving:Connect(function()
     FOVring:Remove()
     ScreenGui:Destroy()
+    validNPCs = {}
 end)
 
 RunService.Heartbeat:Connect(updateHitboxes)
