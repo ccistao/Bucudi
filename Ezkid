@@ -381,7 +381,7 @@ ToggleButton.MouseButton1Click:Connect(function()
     if isDragging then return end  -- Chặn nếu đang kéo
     isAiming = not isAiming
     FOVring.Visible = isAiming
-    ToggleButton.Text = "AIMBOT: " .. (isAiming and "ON" or "OFF")
+    ToggleButton.Text = "AIMBOT: " .. (isAiming and "BẬT" or "TẮT")
     ToggleButton.TextColor3 = isAiming and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50)
 end)
 
@@ -452,7 +452,7 @@ local function predictPos(target)
     return basePosition + headOffset
 end
 
-local aimRange = 400 -- Chỉ aim NPC trong bán kính này (có thể chỉnh)
+local aimRange = 380 -- Chỉ aim NPC trong bán kính này (có thể chỉnh)
 
 local function getTarget()
     local nearest = nil
@@ -502,7 +502,7 @@ end
 
 local heartbeat = RunService.Heartbeat
 local lastUpdate = 0
-local UPDATE_INTERVAL = 0.5 -- Cập nhật mỗi 0.5 giây
+local UPDATE_INTERVAL = 0.4 -- Cập nhật mỗi 0.5 giây
 
 RunService.Heartbeat:Connect(function(dt)
     updateDrawings()  -- Cập nhật vị trí FOVring mỗi lần vẽ
