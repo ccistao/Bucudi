@@ -463,31 +463,32 @@ local function getTarget()
     for _, npc in ipairs(validNPCs) do
         local predictedPos = predictPos(npc)
         local screenPos, visible = Cam:WorldToViewportPoint(predictedPos)
-        
+
         if visible and screenPos.Z > 0 then
             local playerPos = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") and Player.Character.HumanoidRootPart.Position
             if playerPos then
                 local distanceToNPC = (npc:FindFirstChild("HumanoidRootPart").Position - playerPos).Magnitude
 
-                -- CHỈ AIM nếu NPC nằm trong phạm vi aimRange
+                -- Chỉ aim NPC trong phạm vi cho phép
                 if distanceToNPC <= aimRange then
                     local ray = workspace:Raycast(
                         Cam.CFrame.Position,
                         (predictedPos - Cam.CFrame.Position).Unit * 1000,
                         raycastParams
                     )
-                 
+
                     if ray and ray.Instance:IsDescendantOf(npc) then
-                        local distance = (Vector2.new(screenPos.X, screenPos.Y) - viewportCenter).Magnitude
-                        if distance < minDistance and distance < fov then
-                            minDistance = distance
+                        -- Nếu chưa có NPC nào hoặc NPC này gần hơn NPC hiện tại -> chọn NPC này
+                        if not nearest or distanceToNPC < minDistance then
                             nearest = npc
+                            minDistance = distanceToNPC
                         end
                     end
                 end
             end
         end
     end
+
     return nearest
 end
 
